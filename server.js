@@ -2,6 +2,7 @@ const express = require('express'),
 app = express(),
 port = process.env.PORT || 3000;
 
+const bodyParser  = require("body-parser");
 const configFile  = require("./config/local");
 const mysql = require('mysql');
 
@@ -28,5 +29,4 @@ con.connect( err => {
 
 app.use((req, res) => {
     res.status(404).send({url: req.originalUrl + ' not found'})
-});
-  
+});  
