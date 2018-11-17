@@ -1,22 +1,20 @@
 'use strict';
 const modelSignup = require('../models/modelSignup');
 
-exports.sign_up = (req, res) => {
-    let d = new Date();
-    d.setMonth(d.getMonth() + 1);
+exports.sing_up = (req, res) => {
+    let expiration = new Date();
+    expiration.setMonth(expiration.getMonth() + 1);
 
-    let token = '343dff33d3gg3';
-    
-    const params = [
-        req.body.nome,
-        req.body.email,
-        req.body.senha,
-        "sadsafsaf342",
-        d,
-        token
-    ];
+    const usuario = {
+        nome: req.body.nome,
+        email: req.body.email,
+        senha: req.body.senha,
+        chave: "sadsafsaf342",
+        expiracao: expiration,
+        token: "token"
+    };
 
-    modelSignup.insert_user(params).then(ret => {
+    modelSignup.insert_user(usuario).then(ret => {
         res.status(200).send(ret);
-    }).catch (err => res.status(505).send(err));
+    }).catch (err => {console.log(err); res.status(403).send(err)});
 };

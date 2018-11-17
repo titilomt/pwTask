@@ -6,8 +6,8 @@ const loginController = require('../controllers/loginController');
 
 // exemple Routes
 //GET
-router.get('/', loginController.do_login);
+router.post('/', loginController.authentication);
 
-router.get('/forgetPassword/:email', loginController.forget_password);
+//router.get('/forgetPassword/:email', loginController.forget_password);
 
 module.exports = router;
