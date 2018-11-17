@@ -15,7 +15,7 @@ exports.do_login = (userID) => {
 };
 
 exports.forgot_passqord = (userEmail) => {
-    sql = "SELECT * FROM usuario WHERE email = (?) ";
+    sql = "SELECT email, senha FROM usuario WHERE email = (?) ";
 
     return new Promise ((res, rej) => {
         db.query(sql, [userEmail], (err, results) => {

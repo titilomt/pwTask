@@ -6,7 +6,7 @@ const loginController = require('../controllers/loginController');
 
 // exemple Routes
 //GET
-router.get('/', loginController.login);
+router.get('/', loginController.do_login);
 
 router.get('/forgetPassword/:email', loginController.forget_password);
 
