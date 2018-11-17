@@ -6,9 +6,6 @@ const exempleController = require('../controllers/exempleController');
 
 // exemple Routes
 router.get('/', exempleController.list_all_users);
-    
-//POST 
-router.post('/', exempleController.create_user);
 
 router.get('/exemple/:nome', exempleController.exemple_retrive_user);
 
