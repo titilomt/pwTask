@@ -1,16 +1,20 @@
 'use strict';
+const express = require('express');
+const router  = express.Router();
 
-module.exports = app => {
-    const exempleController = require('../controllers/exempleController');
+const exempleController = require('../controllers/exempleController');
 
-    // todoList Routes
-    app.route('/exemple')
-        .get(exempleController.list_all_tasks)
-        .post(exempleController.create_a_task);
+// exemple Routes
+router.get('/', exempleController.list_all_users);
+    
+//POST 
+router.post('/', exempleController.create_user);
 
+router.get('/exemple/:nome', exempleController.exemple_retrive_user);
 
-    app.route('/exemple/:taskId')
-        .get(exempleController.read_a_task)
-        .put(exempleController.update_a_task)
-        .delete(exempleController.delete_a_task);
-};
+// app.route('/exemple/:taskId')
+//     .get(exempleController.read_a_task)
+//     .put(exempleController.update_a_task)
+//     .delete(exempleController.delete_a_task);
+
+module.exports = router;

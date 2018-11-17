@@ -1,21 +1,36 @@
 'use strict';
+const modelExemple = require('../models/modelExemple');
 
-exports.list_all_tasks = function(req, res) {
-    res.send("alive");
-    // Task.find({}, function(err, task) {
-    //   if (err)
-    //     res.send(err);
-    //   res.json(task);
-    // });
-};  
+exports.list_all_users = (req, res) => {    
+    modelExemple.get_all_users().then(ret => {        
+        res.status(200).send(ret);
+    }).catch (err => res.status(404).send(err));
+};
   
-exports.create_a_task = function(req, res) {
-    var new_task = new Task(req.body);
-    new_task.save(function(err, task) {
-        if (err)
-        res.send(err);
-        res.json(task);
-    });
+exports.create_user = (req, res) => {
+    let d = new Date();
+    d.setMonth(d.getMonth() + 1);
+
+    let token = '343dff33d3gg3';
+    const params = [
+        req.body.nome,
+        req.body.email,
+        req.body.senha,
+        "sadsafsaf342",
+        d,
+        token
+    ];
+
+    modelExemple.insert_user(params).then(ret => {
+        res.status(200).send(ret);
+    }).catch (err => res.status(505).send(err));
+};
+
+exports.exemple_retrive_user = (req, res) => {
+    const params = res.body.nome;
+    modelExemple.get_one_user(params).then(ret => {
+        res.status(200).send(ret);
+    }).catch (err => res.status(404).send(err));
 };
 
 exports.read_a_task = function(req, res) {
