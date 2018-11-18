@@ -12,8 +12,9 @@ exports.insert_user = params => {
                 db.query(sql, [valuesToArray(params)], err => {
                     if(err) {
                         return rej (err);
-                    }    
-                    return res ({"token" : params.token});
+                    }
+
+                    return res (usuarioTemplate(params));
                 });
             } else return rej (message);        
         }).catch (err => {return err;});
@@ -44,3 +45,11 @@ function verify_email (userEmail) {
         });
     }).catch(err => {return err;});
 };
+
+function usuarioTemplate (data){
+    return {
+        nome: data.nome,
+        email: data.email,
+        expiracao: data.expiracao
+    };
+}
