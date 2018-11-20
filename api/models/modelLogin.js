@@ -40,3 +40,14 @@ exports.authentication = (user) => {
         });
     }).catch(err => {return err;});
 };
+
+exports.update_token = (date, token, id) => {
+    
+    const sql = "UPDATE usuario SET token = ?, expiracao = ? WHERE id = ? ";
+    let params = [date, toekn, id];
+    db.query(sql, [params], (err, results) => {
+        if(err) return err;
+
+        return {status:200, message: 'Novo token gerado com sucesso'};
+    });
+};

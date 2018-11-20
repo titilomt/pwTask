@@ -12,11 +12,10 @@ exports.sing_up = (req, res) => {
         email: req.body.email,
         senha: req.body.senha,
         chave: util.gen(),
-        expiracao: expiration,
-        token: null
+        expiracao: expiration
     };
 
-    jwt.sign({usuarioTemplate}, usuarioTemplate.chave, (err, token) => {
+    jwt.sign({usuarioTemplate}, `${usuarioTemplate.chave }${expiration}`, (err, token) => {
         if (err) throw err;
         
         usuarioTemplate.token = token;
