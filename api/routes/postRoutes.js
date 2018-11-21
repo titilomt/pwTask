@@ -1,7 +1,7 @@
 'use strict';
+const util    = require('../util/util');
 const express = require('express');
 const router  = express.Router();
-const util    = require('../util/util');
 
 const postController = require('../controllers/postController');
 
