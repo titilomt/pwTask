@@ -1,4 +1,6 @@
-const bcrypt = require('bcrypt');
+'use strict';
+const bcrypt    = require('bcrypt');
+const modelUtil = require('../models/modelUtil');
 
 exports.encrypt = pass => {
     let hash = bcrypt.hashSync(pass, 8);
@@ -26,3 +28,15 @@ exports.verifyToken = (req, res, next) => {
         res.sendStatus(403);
     }
 };
+
+exports.reqTokenValidate = (reqToken, userID) => {
+    return new Promise ((res, rej) => { 
+        modelUtil.validate_token(userID).then(ret => {
+            let date = new Date();
+            if(date < ret.expiracao && ret.token === reqToken) {
+                return res ({status: 200, message: ret});
+            }
+            else return rej(ret);
+        }).catch (err => {return err;});
+    });
+}

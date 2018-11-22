@@ -1,5 +1,5 @@
+'use strict';
 const db = require('../util/dbconnection');
-const jwt = require('jsonwebtoken');
 
 exports.get_all_users = _=> {
     let resultJson = '';

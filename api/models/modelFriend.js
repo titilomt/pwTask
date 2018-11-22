@@ -1,3 +1,4 @@
+'use strict';
 const db = require('../util/dbconnection');
 
 exports.add_friend = params => {

@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const db   = require('../util/dbconnection');
 const bcrypt = require('bcrypt');
 const util = require('../util/util');

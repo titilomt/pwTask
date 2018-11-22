@@ -14,7 +14,6 @@ exports.insert_group = templateGrupo => {
             return res ("Grupo criado com sucesso.");
         });
     });
-
 };
 
 exports.delete_group = (userID, grupoID) => {
