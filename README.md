@@ -18,14 +18,14 @@ Rotas que precisam de um nivel de autenticação estão protegidas por um token 
 
 <ul>        
 <li>
-    <code>user</code>: (POST, PUT, DELETE) CRUD de usuarios de uma rede social exemplo de rota POST <code>{{URL}}/user/login</code>:<br><code>
+    <code>user</code>: (POST, PUT, DELETE) CRUD de usuarios de uma rede social exemplo de rota POST <code>{{URL}}/user/login</code>:<br><pre><code>
       [
         {
            email: "a@a.com", 
            senha: "oioioi"
         }
       ]
-    </code>
+    </code></pre>
 </li> 
 <li><code>friends</code>: (POST, PUT, DELETE) CRUD de amigos de uma rede social exemplo de rota GET <code>{{URL}}/friends/</code>:<br><code>
       [
