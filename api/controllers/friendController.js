@@ -30,7 +30,7 @@ exports.search_friend = (req, res) => {
 
 exports.list_all_friends = (req, res) => {
     
-    const userID = req.body.id;
+    const userID = req.body.user_id;
 
     modelFriend.get_all_friends(userID).then(ret => {
         res.status(200).send(ret);

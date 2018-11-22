@@ -29,7 +29,6 @@ exports.sing_up = (req, res) => {
 
 exports.authentication = (req, res) => {
     let params = [
-        req.body.id,
         req.body.email,
         req.body.senha
     ];

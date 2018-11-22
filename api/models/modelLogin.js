@@ -1,16 +1,16 @@
 const db = require('../util/dbconnection');
 const bcrypt = require('bcrypt');
 
-exports.authentication = (user) => {
+exports.authentication = (params) => {
     const sql = "SELECT id_usuario, senha, nome, email, chave, token, expiracao FROM usuario WHERE email = ? ";
     
     return new Promise ((res, rej) => {
-        db.query(sql, [user[0]], (err, results) => {
+        db.query(sql, [params[0]], (err, results) => {
             if(err) return rej(err);
             let resultJson = JSON.stringify(results[0]);
             resultJson = JSON.parse(resultJson);
             if(results.length > 0) {
-                bcrypt.compare(user[1], resultJson.senha, (err, ret)=> {
+                bcrypt.compare(params[1], resultJson.senha, (err, ret)=> {
                     if (err) return rej(err);
                     
                     if(ret) {

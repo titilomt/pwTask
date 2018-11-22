@@ -5,7 +5,7 @@ const jwt         = require('jsonwebtoken');
 exports.post = (req, res) => {
     let date = new Date();
     params = [
-        req.body.ownerID,
+        req.body.owner_id,
         req.body.nome,
         date,
         req.body.text,
