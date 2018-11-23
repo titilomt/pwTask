@@ -8,6 +8,7 @@ module.exports = (app) => {
   const postRoutes  = require("./postRoutes");
   const grupoRoutes  = require("./grupoRoutes");
   const profileRoutes  = require("./profileRoutes");
+  const postGrupoRoutes  = require("./postGrupoRoutes");
 
   // Other route groups could go here, in the future
 
@@ -17,4 +18,5 @@ module.exports = (app) => {
   app.use('/post', postRoutes);
   app.use('/grupo', grupoRoutes);
   app.use('/profile', profileRoutes);
+  app.use('/postGroup', postGrupoRoutes);
 };

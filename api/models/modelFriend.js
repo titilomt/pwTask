@@ -90,3 +90,18 @@ exports.send_direct = params => {
         });
     });
 };
+
+exports.retrive_direct = params => {
+    const sql = `SELECT text, name, date_message FROM direct_message 
+                 WHERE  id = ? 
+                 AND id_amigos = ? 
+                 AND ( date_message BETWEEN ? AND SYSDATE ) `;
+
+    return new Promise ((res, rej) => {
+        db.query(sql, [params], (err) => {
+            if(err) return rej(err);
+
+            return res(`messagem enviada em ${params[3]}`);
+        });
+    });
+};

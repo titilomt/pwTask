@@ -59,23 +59,31 @@ exports.authentication = (req, res) => {
 };
 
 exports.delete_user = (req, res) => {
-    modelUser.delete_user(req.body.id).then(ret => {
-        res.status(200).send(ret);
-    }).catch (err => {res.status(403).send(err)});
+
+    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+        if(err) res.sendStatus(403);
+        modelUser.delete_user(req.params.idOwner).then(ret => {
+            res.status(200).send(ret);
+        }).catch (err => {res.status(403).send(err)});
+    });
 };
 
 exports.update_user = (req, res) => {
     
     const params = [
-        req,body.id,
+        req,params.idOwner,
         req.body.nome,
         req.body.oldSenha,
         req.body.newSenha
     ];
 
-    modelUser.update_user(params).then(ret => {
-        res.status(200).send(ret);
-    }).catch (err => {res.status(403).send(err)});
+    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+        if(err) res.sendStatus(403);
+        
+        modelUser.update_user(params).then(ret => {
+            res.status(200).send(ret);
+        }).catch (err => {res.status(403).send(err)});
+    });
 };
 
 exports.forgot_password = (req, res) => {

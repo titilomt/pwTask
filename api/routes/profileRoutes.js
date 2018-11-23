@@ -7,10 +7,10 @@ const profileController = require('../controllers/profileController');
 
 router.post('/createProfile', util.verifyToken, profileController.create_profile);
 
-router.delete('/deleteProfile', util.verifyToken, profileController.delete_profile);
+router.delete('/:idOwner/:idProfile', util.verifyToken, profileController.delete_profile);
 
-router.put('/modifyProfile', util.verifyToken, profileController.modify_profile);
+router.put('/modifyProfile/:idOwner/:idProfile', util.verifyToken, profileController.modify_profile);
 
-router.get('/', util.verifyToken, profileController.get_profile_by_id);
+router.get('/:idOwner', util.verifyToken, profileController.get_profile_by_id);
 
 module.exports = router;

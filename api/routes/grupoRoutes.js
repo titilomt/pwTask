@@ -5,11 +5,11 @@ const router  = express.Router();
 
 const grupoController = require('../controllers/grupoController');
 
-router.post('/createGroup', grupoController.create_group);
+router.post('/createGroup', util.verifyToken, grupoController.create_group);
 
-router.delete('/deleteGroup', util.verifyToken, grupoController.delete_group);
+router.delete('/deleteGroup/:idOwner/:idGrupo', util.verifyToken, grupoController.delete_group);
 
-router.put('/modifyGroup', util.verifyToken, grupoController.modify_group);
+router.put('/modifyGroup/:idOwner/:idGrupo', util.verifyToken, grupoController.modify_group);
 
 router.get('/', util.verifyToken, grupoController.get_group_by_name);
 

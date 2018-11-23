@@ -10,7 +10,7 @@ router.get('/', util.verifyToken, postController.list_all_posts);
 
 router.post('/', util.verifyToken, postController.post);
 
-router.delete('/:id' , util.verifyToken, postController.delete_a_post);
+router.delete('/:idOwner/:idPost' , util.verifyToken, postController.delete_a_post);
 
 router.put('/:id' , util.verifyToken, postController.update_a_post);
 

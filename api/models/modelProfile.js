@@ -17,16 +17,18 @@ exports.create_profile = params => {
 
 };
 
-exports.delete_profile = (userID) => {
-    const sql = "DELETE profile WHERE id_owner = ? ";
+exports.delete_profile = (params) => {
+    const sql = "DELETE profile WHERE id_owner = ? AND id = ? ";
 
     return new Promise ((res, rej) => {
-        verifyOwner(userID).then(ret => {
+        verifyOwner(params).then(ret => {
             if(ret === "ok") {
-                db.query(sql, [userID, grupoID], err => {
+                db.query(sql, [params], err => {
                     if(err) return rej (err);
 
-                    return res("Perfil deletado.");
+                    if(result.length > 0) return res("Perfil deletado.");
+
+                    else return rej({message: 'Não foi possivel encontrar Perfil.'})
                 });
             } else return rej(ret);
         });
@@ -36,15 +38,21 @@ exports.delete_profile = (userID) => {
 exports.modify_profile = params => {
     const sql = `UPDATE profile SET nome = ?, dt_nascimento = ?, escolaridade = ?,
                     relacionamento_status = ?, background_img = ?, profile_img = ?, privacidade = ?
-                 WHERE id_owner = ? `;
+                 WHERE id_owner = ? AND id = ? `;
+
+    let verifyParams = [
+        params[7],
+        params[8]
+    ];
 
     return new Promise ((res, rej) => {
-        verifyOwner(params[7]).then(ret => {
+        verifyOwner(verifyParams).then(ret => {
             if(ret === "ok") {
-                db.query(sql, [params], err => {
+                db.query(sql, [params], (err, result) => {
                     if(err) return rej (err);
+                    if(result.length > 0) return res("Perfil alterado com sucesso.");
 
-                    return res("Grupo alterado com sucesso.");
+                    else return rej({message: 'Não foi possivel encontrar Perfil.'});
                 });
             } else return rej(ret);                
         });
@@ -60,20 +68,25 @@ exports.get_profile_by_id = userID => {
         db.query(sql, [userID], (err, results) => {
             if(err) return rej(err);
             
-            let resultJson = JSON.stringify(results);
-            resultJson = JSON.parse(resultJson);
-            return res(resultJson);
+            if (results.length > 0 ){
+                
+                let resultJson = JSON.stringify(results);
+                resultJson = JSON.parse(resultJson);
+                return res(resultJson);
+            } else return rej({message: 'Perfil não encontrado.'});
         });
     });
 };
 
-function verifyOwner(userID) {
-    const sql = "SELECT id_owner FROM profile WHERE id_owner = ?";
+function verifyOwner(params) {
+    const sql = "SELECT id FROM profile WHERE id_owner = ?";
     return new Promise ((res, rej) => {
-        db.query(sql, [userID], (err, results) => {
+        db.query(sql, [params[0]], (err, results) => {
             if(err) return rej(err);
-            
-            if(results.length > 0) {
+
+            let resultJson = JSON.stringify(results);
+            resultJson = JSON.parse(resultJson);
+            if(results.length > 0 && resultJson.id === params[1]) {
                 return res ("ok");
             } 
             return rej("Não é o dono do perfil.");

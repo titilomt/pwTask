@@ -16,11 +16,11 @@ exports.insert_group = templateGrupo => {
     });
 };
 
-exports.delete_group = (userID, grupoID) => {
+exports.delete_group = (params) => {
     const sql = "DELETE grupo WHERE id_owner = ? AND id_grupo = ? ";
 
     return new Promise ((res, rej) => {
-        verifyOwner(userID, grupoID).then(ret => {
+        verifyOwner(params).then(ret => {
             if(ret === "ok") {
                 db.query(sql, [userID, grupoID], err => {
                     if(err) return rej (err);
@@ -34,9 +34,14 @@ exports.delete_group = (userID, grupoID) => {
 
 exports.update_group = params => {
     const sql = "UPDATE grupo SET nome = ?, img = ? WHERE id_owner = ? AND id_grupo = ? ";
+    
+    let verifyParams = [
+        params[2],
+        params[3]
+    ];
 
     return new Promise ((res, rej) => {
-        verifyOwner(params[2], params[3]).then(ret => {
+        verifyOwner(verifyParams).then(ret => {
             if(ret === "ok") {
                 db.query(sql, [params], err => {
                     if(err) return rej (err);
@@ -68,19 +73,23 @@ function valuesToArray(obj) {
     });
 };
 
-function verifyOwner(userID, grupoID) {
+async function verifyOwner(params) {
     const sql = "SELECT id_owner FROM grupo WHERE id_grupo = ?";
-    return new Promise ((res, rej) => {
-        db.query(sql, [grupoID], (err, results) => {
-            if(err) return rej(err);
-            
-            let resultJson = JSON.stringify(results[0]);
-            resultJson = JSON.parse(resultJson);
-            
-            if(userID === resultJson.id_owner) {
-                return res ("ok");
-            } 
-            return rej("Não é o dono.");
+    try {
+        return new Promise((res, rej) => {
+            db.query(sql, [params[1]], (err, results) => {
+                if (err)
+                    return rej(err);
+                let resultJson = JSON.stringify(results[0]);
+                resultJson = JSON.parse(resultJson);
+                if (params[0] === resultJson.id_owner) {
+                    return res("ok");
+                }
+                return rej("Não é o dono.");
+            });
         });
-    }).catch(err => {return err;});
-}
+    }
+    catch (err) {
+        return err;
+    }
+};

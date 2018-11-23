@@ -8,7 +8,7 @@ exports.list_all_users = (req, res) => {
 };
 
 exports.exemple_retrive_user = (req, res) => {
-    const params = res.body.nome;
+    const params = req.params.nome;
     modelExemple.get_one_user(params).then(ret => {
         res.status(200).send(ret);
     }).catch (err => res.status(404).send(err));
