@@ -2,9 +2,7 @@
 const modelExemple = require('../models/modelExemple');
 
 exports.list_all_users = (req, res) => {
-    modelExemple.get_all_users().then(ret => {        
-        res.status(200).send(ret);
-    }).catch (err => res.status(404).send(err));
+    res.send(`Olá caro senhor ${req.query.nome}`)
 };
 
 exports.exemple_retrive_user = (req, res) => {
