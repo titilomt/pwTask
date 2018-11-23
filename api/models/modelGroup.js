@@ -67,6 +67,57 @@ exports.get_group_by_name = params => {
     });
 };
 
+exports.join_group  = params => {
+    const sql = "INSERT INTO lista_grupo (id_user, id_grupo, privilegio, data_entrada) VALUES (?)"
+
+    return new Promise ((res, rej) => {
+        db.query(sql, [params], (err, results) => {
+            if(err) return rej(err);
+
+            return res({message: 'Parabens você se tornou um novo membro.'});
+        });
+    });
+};
+
+exports.leave_group  = params => {
+    const sql = `DELETE FROM lista_grupo 
+                 WHERE id_grupo = ? 
+                 AND id_user = ? `;
+
+    return new Promise ((res, rej) => {
+        verifyOwner(params).then(ret => {
+            if(ret === 'ok') return delete_group(params);
+            
+            db.query(sql, [params], (err, results) => {
+                if(err) return rej(err);
+                
+                if(results.lenth > 0) return rej({message: 'Não existem grupos ou usuario neste caminho'});
+                
+                return res({message: 'Você saiu do clan vamo cobra essa fita ae.'});
+            });
+        });
+    });
+};
+
+exports.list_all_user_groups = params => {
+    const sql = `SELECT g.nome, g.img FROM grupo g 
+                 JOIN lista_grupo lg 
+                 ON g.id = lg.id_grupo
+                 WHERE lg.id_user = ? `;
+
+    return new Promise ((res, rej) => {
+        db.query(sql, [params], (err, results) => {
+            if(err) return rej(err);
+            
+            if(results.lenth > 0) return res({message:'Você não possui nenhum grupo.'});
+
+            let resultJson = JSON.stringify(results);
+            resultJson = JSON.parse(resultJson);
+            return res(resultJson);
+        });
+    });
+};
+
 function valuesToArray(obj) {
     return Object.keys(obj).map( key => {
         return obj[key]; 

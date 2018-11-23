@@ -68,3 +68,45 @@ exports.get_group_by_name = (req, res) => {
         });
     }
 };
+
+exports.join_group = (req, res) => {
+    const params = [
+        req.body.id_user,
+        req.body.id_grupo
+    ];
+    
+    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+        if(err) res.sendStatus(403);
+        
+        modelGroup.join_group(params).then(ret => {
+            res.status(200).send(ret);
+        }).catch(err => res.status(404).send(err));
+    });
+};
+
+exports.leave_group = (req, res) => {
+    const params = [
+        req.body.id_user,
+        req.body.id_grupo
+    ];
+    
+    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+        if(err) res.sendStatus(403);
+        
+        modelGroup.leave_group(params).then(ret => {
+            res.status(200).send(ret);
+        }).catch(err => res.status(404).send(err));
+    });
+};
+
+exports.list_all_user_groups = (req, res) => {
+    const params = req.params.idUser;
+
+    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+        if(err) res.sendStatus(403);
+        
+        modelGroup.list_all_user_groups(params).then(ret => {
+            res.status(200).send(ret);
+        }).catch(err => res.status(404).send(err));
+    });
+};
