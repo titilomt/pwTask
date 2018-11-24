@@ -82,7 +82,7 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
         }
       ]
     </code></pre></li>
-    <li><code>post_grupo</code>: (POST, PUT, DELETE) CRUD de posts em grupos de usuários POST <code>{{URL}}/grupostGrupo/</code>:<br><pre><code>
+    <li><code>post_grupo</code>: (POST, PUT, DELETE) CRUD de posts em grupos de usuários POST <code>{{URL}}/postGrupo/</code>:<br><pre><code>
       [
         {
             owner_id: 2,
@@ -90,6 +90,15 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
             nome: "Arnaldo",
             text: "Post de arnaldo ...",
             img: "base64"
+        }
+      ]
+    </code></pre></li>
+    <li><code>list_grupo</code>: (POST, PUT, DELETE) CRUD de lista de grupos de usuários GET<code>{{URL}}/grupo/:idUsuario</code>:<br><pre><code>
+      [
+        {
+            owner_id: 2,
+            grupo_id: 3,
+            permissao: 3 // Traz o tipo de privilegios dentro do grupo de 1 - 5
         }
       ]
     </code></pre></li>
