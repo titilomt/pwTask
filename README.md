@@ -3,6 +3,8 @@ My first job with nodejs!!!
 
 Este projeto é uma Restful-API desenvolvida em node para criar o que seria o básico de uma rede social.
 
+**Scripts para as tabelas estão dentro da pasta config.
+**Para configurar o banco com o projeto é necessário alterar o local.json dentro da pasta config.
 ## Execução
 
 <ul>        
@@ -96,6 +98,7 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
 ## Versões utilizadas
 
 <ul>        
+<li>Banco Utilizado - MySql</li>
 <li>Nodejs v10.10.0</li> 
 <li>npm v6.4.1</li> 
 <li>Dependências externas listadas em <code>package.json</code></li>
