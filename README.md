@@ -42,7 +42,7 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
 <li><code>post</code>: (POST, PUT, DELETE) CRUD de post de uma rede social exemplo de rota POST <code>{{URL}}/post/</code>:<br><pre><code>
       [
         {
-           owner_id: "3",
+           id_owner: "3",
            nome: "Ferdinando",
            date: "2016-09-22T13:57:31.2311892-04:00",
            text: "Olá mundo!",
@@ -51,11 +51,11 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
         }
       ]
     </code></pre></li>
-<li><code>grupo</code>: (POST, PUT, DELETE) CRUD de grupo de uma rede social exemplo de rota POST <code>{{URL}}/grupo/login</code>:<br><pre><code>
+<li><code>grupo</code>: (POST, PUT, DELETE) CRUD de grupo de uma rede social exemplo de rota POST <code>{{URL}}/grupo/</code>:<br><pre><code>
       [
         {
-           email: "a@a.com", 
-           senha: "oioioi"
+          id_owner: 2,
+          nome: "Grupo das Estrelas",
         }
       ]
     </code></pre></li>
