@@ -3,26 +3,40 @@ const db   = require('../util/dbconnection');
 
 exports.insert_group = templateGrupo => {
     const sql = "INSERT INTO grupo (id_owner, nome, criacao, img) VALUES (?)";
-
     let params = valuesToArray(templateGrupo);
 
-    return new Promise ((res, rej) => {
+    return new Promise((res, rej) => {
         db.query(sql, [params], err => {
             if(err) {
                 return rej (err);
             }
-            return res ("Grupo criado com sucesso.");
+
+            return res({message: "grupo criado com sucesso!"});
+        });
+    });
+};
+
+exports.get_group_by_id = params => {    
+    const sql = "SELECT id WHERE id_owner = ? ";
+
+    return new Promise((res, rej) => {
+        db.query(sql, [params], (err, result) => {
+            if(err) {
+                return rej (err);
+            }
+
+            return res (result[0]);
         });
     });
 };
 
 exports.delete_group = (params) => {
-    const sql = "DELETE grupo WHERE id_owner = ? AND id_grupo = ? ";
+    const sql = "DELETE grupo WHERE id_grupo = ? ";
 
     return new Promise ((res, rej) => {
         verifyOwner(params).then(ret => {
-            if(ret === "ok") {
-                db.query(sql, [userID, grupoID], err => {
+            if(ret.message === "ok") {
+                db.query(sql, [params[1]], err => {
                     if(err) return rej (err);
 
                     return res("Grupo deletado.");
@@ -42,7 +56,7 @@ exports.update_group = params => {
 
     return new Promise ((res, rej) => {
         verifyOwner(verifyParams).then(ret => {
-            if(ret === "ok") {
+            if(ret.message === "ok") {
                 db.query(sql, [params], err => {
                     if(err) return rej (err);
 
@@ -73,27 +87,31 @@ exports.join_group  = params => {
     return new Promise ((res, rej) => {
         db.query(sql, [params], (err, results) => {
             if(err) return rej(err);
-
+            if(results.lenth === 0) res({message: "Não foi possivel entrar no grupo."})
             return res({message: 'Parabens você se tornou um novo membro.'});
         });
     });
 };
 
 exports.leave_group  = params => {
-    const sql = `DELETE FROM lista_grupo 
-                 WHERE id_grupo = ? 
-                 AND id_user = ? `;
+    const sql = `DELETE lista_grupo 
+                 WHERE id_usuario = ? 
+                 AND id_grupo = ? `;
 
     return new Promise ((res, rej) => {
         verifyOwner(params).then(ret => {
-            if(ret === 'ok') return delete_group(params);
+            
             
             db.query(sql, [params], (err, results) => {
                 if(err) return rej(err);
                 
                 if(results.lenth > 0) return rej({message: 'Não existem grupos ou usuario neste caminho'});
-                
-                return res({message: 'Você saiu do clan vamo cobra essa fita ae.'});
+
+                if(ret.message === 'ok') {
+                    return delete_group(params);
+                } else {
+                    return res({message: 'Você saiu do clan vamo cobra essa fita ae.'});
+                }                
             });
         });
     });
@@ -103,13 +121,13 @@ exports.list_all_user_groups = params => {
     const sql = `SELECT g.nome, g.img FROM grupo g 
                  JOIN lista_grupo lg 
                  ON g.id = lg.id_grupo
-                 WHERE lg.id_user = ? `;
+                 WHERE lg.id_usuario = ? `;
 
     return new Promise ((res, rej) => {
         db.query(sql, [params], (err, results) => {
             if(err) return rej(err);
             
-            if(results.lenth > 0) return res({message:'Você não possui nenhum grupo.'});
+            if(results.lenth === 0) return res({message:'Você não possui nenhum grupo.'});
 
             let resultJson = JSON.stringify(results);
             resultJson = JSON.parse(resultJson);
@@ -124,23 +142,35 @@ function valuesToArray(obj) {
     });
 };
 
-async function verifyOwner(params) {
-    const sql = "SELECT id_owner FROM grupo WHERE id_grupo = ?";
-    try {
-        return new Promise((res, rej) => {
-            db.query(sql, [params[1]], (err, results) => {
-                if (err)
-                    return rej(err);
-                let resultJson = JSON.stringify(results[0]);
-                resultJson = JSON.parse(resultJson);
-                if (params[0] === resultJson.id_owner) {
-                    return res("ok");
-                }
-                return rej("Não é o dono.");
-            });
+exports.insert_list_grupo = params => {
+    const sql = "INSERT INTO lista_grupo (id_usuario, id_grupo, permissao) VALUES (?) ";
+
+    return new Promise ((res, rej) => {
+        db.query(sql, [params], (err, results) => {
+            if(err) return rej(err);
+            
+            if(results.lenth === 0) return rej({message:'Erro ao adicionar a lista.'});
+
+            return res({message: "Lista grupo atualizada!"});
         });
-    }
-    catch (err) {
-        return err;
-    }
+    });    
+};
+
+async function verifyOwner(params) {
+    const sql = "SELECT permissao FROM lista_grupo WHERE id_usuario = ? AND id_grupo = ? ";
+  
+    return new Promise((res, rej) => {
+        db.query(sql, [params], (err, results) => {
+            if (results.lenth === 0) return rej({message: "Grupo não encontrado."})
+            
+            if (err) return rej(err);
+            let resultJson = JSON.stringify(results[0]);
+            resultJson = JSON.parse(resultJson);
+            if (resultJson.permissao === 4) { // Permissao de dono do grupo
+                return res({message:"ok"});
+            }
+            
+            return rej({message:"Não é o dono."});
+        });
+    });
 };

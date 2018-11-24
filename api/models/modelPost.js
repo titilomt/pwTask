@@ -1,5 +1,10 @@
 'use strict';
+const cacheService = require('./cache.service');
+
 const db = require('../util/dbconnection');
+
+const ttl = 60 * 60 * 72; // cache for 3 days
+const cache = cacheService.constructor(ttl);
 
 exports.post = params => {
     const sql = "INSERT INTO post (id_owner, nome, data_criacao, text, img, visualizacao) VALUES (?) ";
@@ -16,12 +21,11 @@ exports.post = params => {
 };
 
 exports.list_all_posts = userID => {
-    const sql = `SELECT p.id_post, p.nome, p.text, p.img FROM post p, amigos a, usuario u 
-                 WHERE u.id_usuario IN (a.id_usuarioA, a.id_usuarioB)
-                 AND p.id_owner = a.id_usuarioB 
-                 AND `;
+    const sql = `SELECT p.id_post, p.nome, p.text, p.img 
+                 FROM post p 
+                 INNER JOIN amigos ON amigos.id_usuarioA = ? `;
 
-    return new Promise ((res, rej) => {
+    return cache.get(`getFriendsPost_${userID}`, _=> {
         db.query(sql, [userID], (err, results) => {
             if(err) return rej(err);
             
@@ -39,6 +43,8 @@ exports.delete_post = params => {
     return new Promise ((res, rej) => {
         db.query(sql, [params], (err, results) => {
             if(err) return rej(err);
+
+            cache.del(`getFriendsPost_${userID}`);
             if (results.length > 0) return res({message: 'Post deletado com sucesso.'});
 
             else return rej({message: 'Usuario não é o proprietario, ou post não existe!'});

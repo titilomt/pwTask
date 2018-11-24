@@ -31,10 +31,10 @@ exports.auto_complete = userName => {
 };
 
 exports.get_all_friends = userID => {
-    const sql = `SELECT id, nome, email, id_direct FROM amigos 
-                 WHERE id_usuarioA = ? 
-                 OR id_usuarioB = ? 
-                 AND ativo`;
+    const sql = `SELECT u.id, u.nome, u.email, f.id_direct FROM usuario u
+                    INNER JOIN amigos f ON f.id_usuarioB = u.id_usuario
+                    where f.id_usuarioA = ? 
+                 AND ativo `;
 
     return new Promise ((res, rej) => {
         db.query(sql, [userID, userID], (err, results) => {

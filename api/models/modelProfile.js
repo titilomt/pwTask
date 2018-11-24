@@ -1,5 +1,9 @@
 'use strict';
-const db   = require('../util/dbconnection');
+const db           = require('../util/dbconnection');
+const cacheService = require('./cache.service');
+
+const ttl = 60 * 60 * 72; // cache for 3 days
+const cache = cacheService.constructor(ttl);
 
 exports.create_profile = params => {
     const sql = `INSERT INTO profile (id_owner, nickname, 
@@ -25,7 +29,7 @@ exports.delete_profile = (params) => {
             if(ret === "ok") {
                 db.query(sql, [params], err => {
                     if(err) return rej (err);
-
+                    cache.del(`getUserProfile_${params[0]}`);
                     if(result.length > 0) return res("Perfil deletado.");
 
                     else return rej({message: 'Não foi possivel encontrar Perfil.'})
@@ -50,6 +54,7 @@ exports.modify_profile = params => {
             if(ret === "ok") {
                 db.query(sql, [params], (err, result) => {
                     if(err) return rej (err);
+                    cache.del(`getUserProfile_${userID}`);
                     if(result.length > 0) return res("Perfil alterado com sucesso.");
 
                     else return rej({message: 'Não foi possivel encontrar Perfil.'});
@@ -64,16 +69,15 @@ exports.get_profile_by_id = userID => {
                     dt_nascimento, escolaridade, relacionamento_status, 
                     background_img, privacidade FROM profile WHERE id_owner = ? `;
 
-    return new Promise ((res, rej) => {
+    return cache.get(`getUserProfile_${userID}`, _=> {
         db.query(sql, [userID], (err, results) => {
             if(err) return rej(err);
             
-            if (results.length > 0 ){
-                
+            if (results.length > 0 ){                
                 let resultJson = JSON.stringify(results);
                 resultJson = JSON.parse(resultJson);
-                return res(resultJson);
-            } else return rej({message: 'Perfil não encontrado.'});
+                return resultJson;
+            } else return {message: 'Perfil não encontrado.'};
         });
     });
 };

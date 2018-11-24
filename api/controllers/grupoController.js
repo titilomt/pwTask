@@ -5,17 +5,31 @@ const jwt         = require('jsonwebtoken');
 exports.create_group = (req, res) => {
     let date = new Date();
     
-    let groupTemplate = {
+    const groupTemplate = {
         id_owner: req.body.userID,
         nome: req.body.nome,
         date
     };
+
+    const id_user = groupTemplate.id_owner;
     
     jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
         if(err) res.sendStatus(403);
-
-        modelGroup.insert_group(groupTemplate).then(ret => {
+        Promise.resolve().then( ret=> {
+            modelGroup.insert_group(groupTemplate);    
             res.status(200).send({status: 200, data: ret});
+        }).then( _=>{
+            modelGroup.get_group_by_id(id_user).then(data => {
+                params = [
+                    id_user,
+                    data,
+                    5
+                ];
+
+                modelGroup.insert_list_grupo(params).then(ret => {
+                    res.status(200).send(ret);
+                }).catch (err => {res.status(403).send(err)});
+            }).catch (err => {res.status(403).send(err)});
         }).catch (err => {res.status(403).send(err)});
     });
 };
