@@ -2,7 +2,7 @@
 const db   = require('../util/dbconnection');
 
 exports.insert_group = templateGrupo => {
-    const sql = "INSERT INTO grupo (id_owner, nome, criacao, img) VALUES (?)";
+    const sql = "INSERT INTO grupo (id_owner, nome, chave, date_grupo, img, privacidade) VALUES (?)";
     let params = valuesToArray(templateGrupo);
 
     return new Promise((res, rej) => {
@@ -16,62 +16,61 @@ exports.insert_group = templateGrupo => {
     });
 };
 
-exports.get_group_by_id = params => {    
-    const sql = "SELECT id WHERE id_owner = ? ";
+exports.get_group_id = (params, key) => {
+    const sql = "SELECT id FROM grupo WHERE id_owner = ? AND chave = ? ";
 
     return new Promise((res, rej) => {
-        db.query(sql, [params], (err, result) => {
+        db.query(sql, [params, key], (err, result) => {
             if(err) {
                 return rej (err);
             }
-
-            return res (result[0]);
+            
+            let resultJson = JSON.stringify(result);
+            resultJson = JSON.parse(resultJson);
+            return res (resultJson);
         });
     });
 };
 
 exports.delete_group = (params) => {
-    const sql = "DELETE grupo WHERE id_grupo = ? ";
+    const sql = "DELETE FROM grupo WHERE id = ? AND id_owner = ? ";
 
     return new Promise ((res, rej) => {
-        verifyOwner(params).then(ret => {
-            if(ret.message === "ok") {
-                db.query(sql, [params[1]], err => {
+        // verifyOwner(params).then(ret => {
+            // if(ret.message === "ok") {
+                db.query(sql, [params[0], params[1]], (err, result) => {
                     if(err) return rej (err);
+                    if(result.affectedRows > 0) return res({message: "Grupo deletado."});
 
-                    return res("Grupo deletado.");
+                    else return rej({message: "Não tem permissão de delete."})
                 });
-            } else return rej(ret);                
-        });
+            // } else return rej(ret);                
+        // });
     });
 };
 
 exports.update_group = params => {
-    const sql = "UPDATE grupo SET nome = ?, img = ? WHERE id_owner = ? AND id_grupo = ? ";
+    const sql = "UPDATE grupo SET nome = ?, img = ? WHERE id_owner = ? AND id = ? ";
     
-    let verifyParams = [
-        params[2],
-        params[3]
-    ];
-
     return new Promise ((res, rej) => {
-        verifyOwner(verifyParams).then(ret => {
-            if(ret.message === "ok") {
-                db.query(sql, [params], err => {
-                    if(err) return rej (err);
+        // verifyOwner(verifyParams).then(ret => {
+            // if(ret.message === "ok") {
+        db.query(sql, [params[0], params[1], params[2], params[3]], (err, result) => {
+            if(err) return rej (err);
 
-                    return res("Grupo alterado com sucesso.");
-                });
-            } else return rej(ret);                
+            if(result.affectedRows > 0) return res({message:"Grupo alterado com sucesso."});
+            else return rej({message: "Não possui permissão de modificar."})
         });
+            // } else return rej(ret);                
+        // });
     });
 };
 
-exports.get_group_by_name = params => {
-    const sql = "SELECT id_grupo, nome, img FROM grupo WHERE nome LIKE CONCAT( ?, '%')  ";
+exports.get_group_by_name = grupoName => {
+    const sql = "SELECT id, nome, img FROM grupo WHERE LOWER(nome) LIKE CONCAT( ?, '%')  ";
 
     return new Promise ((res, rej) => {
-        db.query(sql, [params], (err, results) => {
+        db.query(sql, [grupoName], (err, results) => {
             if(err) return rej(err);
             
             let resultJson = JSON.stringify(results);

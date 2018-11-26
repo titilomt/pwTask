@@ -2,33 +2,31 @@ CREATE TABLE `usuario` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
 `nome` varchar(50) NOT NULL,
 `email` varchar(50) NOT NULL,
-`senha` varchar(50) NOT NULL,
-`chave` varchar(22) DEFAULT NULL,
-`expiracao` timestamp NULL DEFAULT NULL,
-`token` longtext DEFAULT NULL,
+`senha` longtext NOT NULL,
+`chave` varchar(255) NOT NULL,
+`expiracao` timestamp NOT NULL,
+`token` longtext DEFAULT NOT NULL,
 PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `amigos` (
-`id` int(11) NOT NULL AUTO_INCREMENT,
 `id_usuario_A` int(11) NOT NULL,
 `id_usuario_B` int(11) NOT NULL,
 `ativo` boolean NULL DEFAULT false,
 `data_criacao` timestamp NULL DEFAULT NULL,
-PRIMARY KEY (`id`),
-FOREIGN KEY (`id_usuario_A`) REFERENCES `usuario` (`id`),
-FOREIGN KEY (`id_usuario_B`) REFERENCES `usuario` (`id`)
+PRIMARY KEY (`id_usuario_A, id_usuario_B`)
 ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `direct_message` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-    `id_amigos` int(11) NOT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `id_usuario_A` int(11) NOT NULL,
+    `id_usuario_B` int(11) NOT NULL,
     `chat_name` varchar(50) NOT NULL DEFAULT "Private Message",
     `text` varchar(255),
     `date_message` timestamp NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`id_amigos`) REFERENCES `amigos` (`id`)
+    FOREIGN KEY (`id_usuario_A`) REFERENCES `amigos` (`id_usuario_A`),
+    FOREIGN KEY (`id_usuario_B`) REFERENCES `amigos` (`id_usuario_B`)
 )ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `post` (
@@ -58,11 +56,14 @@ CREATE TABLE `post_grupo` (
 
 CREATE TABLE `grupo` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
+    `id_owner` int(11) NOT NULL,
     `nome` varchar(50) NOT NULL,
+    `chave` varchar(255) NOT NULL,
     `date_grupo` timestamp NULL DEFAULT NULL,
     `img` blob NULL DEFAULT NULL,
     `privacidade` int(5),
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`id_owner`) REFERENCES `usuario` (`id`)
 )ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `lista_grupo` (

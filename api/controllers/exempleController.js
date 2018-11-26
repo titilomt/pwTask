@@ -2,14 +2,11 @@
 const modelExemple = require('../models/modelExemple');
 
 exports.list_all_users = (req, res) => {
-    res.send(`Olá caro senhor ${req.query.nome}`)
+    res.send(`Olá caro senhor ${req.query.nome}`);
 };
 
-exports.exemple_retrive_user = (req, res) => {
-    const params = req.params.nome;
-    modelExemple.get_one_user(params).then(ret => {
-        res.status(200).send(ret);
-    }).catch (err => res.status(404).send(err));
+exports.exemple_retrive_user = (req, res) => {    
+    res.send(`Olá caro senhor ${req.params.nome}`);
 };
 
 exports.read_a_task = function(req, res) {

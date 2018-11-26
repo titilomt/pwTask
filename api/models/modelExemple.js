@@ -20,7 +20,7 @@ exports.get_all_users = _=> {
 
 exports.get_one_user = params => {
 
-    let sql = "SELECT id, nome, email FROM usuario WHERE TO_LOWER(nome) LIKE TO_LOWER(CONCAT( ??, '%' )) ";
+    let sql = "SELECT id, nome, email FROM usuario WHERE LOWER(nome) LIKE LOWER(CONCAT( ??, '%' )) ";
     
     return new Promise ((res, rej) => {
         db.query(sql, [params], (err, results)=> {

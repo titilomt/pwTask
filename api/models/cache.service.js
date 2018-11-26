@@ -1,22 +1,24 @@
 const NodeCache = require('node-cache');
 
-exports.constructor = ttlSeconds => {
-  this.cache = new NodeCache({ stdTTL: ttlSeconds, checkperiod: ttlSeconds * 0.2, useClones: false });
+
+exports.construct = ttlSeconds => {
+  return new NodeCache({ stdTTL: ttlSeconds, checkperiod: ttlSeconds * 0.2, useClones: false });
 };
 
-exports.get = (key, storeFunction) => {
-  const value = this.cache.get(key);
+exports.getValues = (key, storeFunction, cache) => {
+  const value = cache.get(key);
+  
   if (value) {
     return Promise.resolve(value);
   }
 
   return storeFunction().then((result) => {
-    this.cache.set(key, result);
+    cache.set(key, result);
     return result;
   });
 }
 
-exports.del = (keys) => {
+exports.del = keys => {
   this.cache.del(keys);
 }
 

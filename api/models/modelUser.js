@@ -1,61 +1,65 @@
 'use strict';
-const db   = require('../util/dbconnection');
+const db     = require('../util/dbconnection');
 const bcrypt = require('bcrypt');
-const util = require('../util/util');
+const util   = require('../util/util');
 
 exports.insert_user = params => {
 
     const sql = "INSERT INTO usuario (nome, email, senha, chave, expiracao, token) VALUES (?) ";
     
     return new Promise ((res, rej) => {
-        verify_email(params.email).then(message => {
-            if (message === 'ok') {
+        verify_email(params.email).then(data => {
+            if (data.message === 'ok') {
                 db.query(sql, [valuesToArray(params)], err => {
                     if(err) {
                         return rej (err);
                     }
                     return res (usuarioTemplate(params));
                 });
-            } else return rej (message);        
-        }).catch (err => {return err;});
+            } else return rej (message);
+        }).catch (err => {return rej(err);});
     });    
 };
 
 exports.delete_user = params => {
-    const sql = "DELETE usuario WHERE id_usuario = ? ";
+    const sql = "DELETE FROM usuario WHERE id = ? ";
 
-    return new Promise ((res, rej) => {
-        db.query(sql, [params], err => {
+    return new Promise ((resolve, rej) => {
+        db.query(sql, [params], (err, result) => {
+
             if(err) return rej (err);
-
-            return res ({status: 200, message: "Usuario deletado com sucesso."});
-        }).catch (err => {return err;});
-    }); 
+            if(result.affectedRows === 0 ) return resolve({message: "Nenhum usuário deletado..."});
+            else {
+                return resolve({message: "Usuario deletado com sucesso."});
+            }
+        });
+    }).catch (err => {return rej(err);}); 
 };
 
 exports.update_user = params => {
-    const sql = "UPDATE usuario SET nome = ?, senha = ? WHERE id_usuario = ? ";
+    const sql = "UPDATE usuario SET nome = ?, senha = ? WHERE id = ? ";
     
-    newSenha = util.encrypt(params[3]);
-
+    let newSenha = util.encrypt(params[3]);
     const templateUser = [
         params[1],
         newSenha,
         params[0]    
     ];
-    
-    return new Promise ((res, rej) => {
-        verify_password(params[0], params[2]).then(ret => {
-            if(ret === "ok") {
-                db.query(sql, [templateUser], err => {            
-                    if(err) return rej (err);
-                    let resultJson = JSON.stringify(results[0]);
-                    resultJson = JSON.parse(resultJson);
-                    return res (`Usuario ${templateUser[0]} atualizado com sucesso.`);
-                }).catch (err => {return err;});                
-            } else return rej("Senha incorreta.");
-        });
-    }); 
+
+    return new Promise ((resolve, rej) => {
+        verify_password(params[0], params[2]).then( ret=>{        
+            if(ret.message === "ok") {
+                db.query(sql, [templateUser[0],templateUser[1],templateUser[2]], (err, results) => {
+                    
+                    if(err) return rej({message: err});
+
+                    if(results.affectedRows === 0) return resolve({erro: "0",message: "Usuario não encontrado."});
+                    
+                    return resolve({message: `Usuario ${templateUser[0]} atualizado com sucesso.`});
+                });
+            } else return rej(ret);
+        }).catch(err => {return rej(err)});
+    });
 };
 
 exports.forgot_password = (userEmail, newPassword) => {
@@ -64,14 +68,14 @@ exports.forgot_password = (userEmail, newPassword) => {
     newPassword = util.encrypt(newPassword);
     
     return new Promise ((res, rej) => {
-        verify_email(userEmail).then(message => {
-            if (message === "ok") {
+        verify_email(userEmail).then(data => {
+            if (data.message !== "ok") {
                 db.query(sql, [newPassword, userEmail], err => {
                     if(err) return rej(err);
 
                     return res("Senha alterada com sucesso.");
                 });
-            } else return rej(message);
+            } else return rej(data);
         });
     });
 };
@@ -91,40 +95,39 @@ function verify_email (userEmail) {
     return new Promise ((res, rej) => {
         db.query(sql, [userEmail], (err, results) => {
             if(err) return rej(err);
-            if (!!results && results.length > 0) {
-                let resultJson = JSON.stringify(results[0]);
-                resultJson = JSON.parse(resultJson);
-                return rej (`Email ${resultJson.email} já cadastrado`);
+            if (results.length > 0) {
+                return res ({message: `Email ${userEmail} já cadastrado`});
             } 
-            return res('ok');
+            return res({message:"ok"});
         });
     }).catch(err => {return err;});
 };
 
-function verify_password (userID, oldPassword) {
-    const sql = "SELECT senha FROM usuario WHERE id_usuario = ? ";
-    oldPassword = util.encrypt(oldPassword);
-
-    return new Promise ((res, rej) => {
+const verify_password = (userID, oldPassword) => {
+    const sql = "SELECT senha FROM usuario WHERE id = ? ";
+    
+    return new Promise ((resolve, rej) => {
         db.query(sql, [userID], (err, results) => {
-            if(err) return rej(err);
-
-            let resultJson = JSON.stringify(results[0]);
-            resultJson = JSON.parse(resultJson);
-
-            bcrypt.compare(oldPassword, resultJson.senha, (err)=> {
-                if(err) return rej (err);
-
-                return res ("ok");
-            });
+            if (err) throw err;
+    
+            if(results.length > 0){
+                let resultJson = JSON.stringify(results[0]);
+                resultJson = JSON.parse(resultJson);
+                let match = bcrypt.compareSync(oldPassword, resultJson.senha);
+                    
+                if (match) return resolve({message: "ok"});
+                
+                else return rej({message: "Senha incorreta"});
+            } else return rej({message: "Não encontrou um usuario"});    
         });
-    }).catch(err => {return err;});
+    });   
 };
 
 function usuarioTemplate (data){
     return {
         nome: data.nome,
         email: data.email,
-        expiracao: data.expiracao
+        expiracao: data.expiracao,
+        chave: data.chave
     };
 };

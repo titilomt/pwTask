@@ -1,6 +1,6 @@
 'use strict';
 const bcrypt    = require('bcrypt');
-const modelUtil = require('../models/modelUtil');
+const random    = require('random-key-generator');
 
 exports.encrypt = pass => {
     let hash = bcrypt.hashSync(pass, 8);
@@ -8,7 +8,7 @@ exports.encrypt = pass => {
 };
 
 exports.gen = _=>{
-    return 'secretkey';
+    return random(50);
 };
 
 exports.verifyToken = (req, res, next) => {
@@ -20,7 +20,7 @@ exports.verifyToken = (req, res, next) => {
         // Pegar nosso token do array
         const bearerToken = bearer[1];
         // Set token na requisição
-        req.token = bearerToken;
+        req.token = bearerToken;        
         // Finalmente chamanos o next middleware
         next();
     } else {

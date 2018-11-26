@@ -4,7 +4,7 @@ const jwt         = require('jsonwebtoken');
 
 exports.post = (req, res) => {
     let date = new Date();
-    params = [
+    let params = [
         req.body.owner_id,
         req.body.nome,
         date,
@@ -13,40 +13,44 @@ exports.post = (req, res) => {
         req.body.visualizacao 
     ];
     
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
 
-        modelPost.do_post(params).then(ret => {
-            res.status(200).send({ status: 'success', data: ret});
-        }).catch(err => res.status(403).send(err));
+        else {
+            modelPost.post(params).then(ret => {
+                res.status(200).send({ status: 'success', data: ret});
+            }).catch(err => res.status(403).send(err));
+        }
     });
     
 };
 
 exports.list_all_posts = (req, res) => {
 
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-        
-        modelPost.get_all_posts(req.body.userID).then(ret => {
-            res.status(200).send(ret);
-        }).catch (err => res.status(404).send(err));
+        else {
+            modelPost.list_all_posts(req.body.userID).then(ret => {
+                res.status(200).send(ret);
+            }).catch (err => res.status(404).send(err));
+        }        
     });
 };
 
 exports.delete_a_post = (req, res) => {
 
     const params = [
-        req.params.idOwner,
-        req.params.idPost
+        req.query.idOwner,
+        req.query.idPost
     ];
 
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-
-        modelPost.delete_post(params).then(ret => {
-            res.status(200).send(ret);
-        }).catch(err => res.status(404).send(err));
+        else{
+            modelPost.delete_post(params).then(ret => {
+                res.status(200).send(ret);
+            }).catch(err => res.status(404).send(err));
+        }        
     });
 };
 
@@ -55,16 +59,17 @@ exports.update_a_post = (req, res) => {
     const params = [
         req.body.text,
         req.body.img,
-        req.params.ownerID,
-        req.params.postID,
+        req.query.idOwner,
+        req.query.idPost,
         req.body.visualizacao
     ];
 
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-
-        modelPost.update_post(params).then(ret => {
-            res.status(200).send(ret);
-        }).catch(err => res.status(404).send(err));
+        else {
+            modelPost.update_post(params).then(ret => {
+                res.status(200).send(ret);
+            }).catch(err => res.status(404).send(err));    
+        }
     });
 };

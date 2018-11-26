@@ -2,17 +2,20 @@ const db = require('../util/dbconnection');
 const bcrypt = require('bcrypt');
 
 exports.authentication = (params) => {
-    const sql = "SELECT id_usuario, senha, nome, email, chave, token, expiracao FROM usuario WHERE email = ? ";
+    const sql = "SELECT id, senha, nome, email, chave, token, expiracao FROM usuario WHERE email = ? ";
     
     return new Promise ((res, rej) => {
         db.query(sql, [params[0]], (err, results) => {
             if(err) return rej(err);
-            let resultJson = JSON.stringify(results[0]);
-            resultJson = JSON.parse(resultJson);
             if(results.length > 0) {
+                let resultJson = JSON.stringify(results[0]);
+                resultJson = JSON.parse(resultJson);
+                
                 bcrypt.compare(params[1], resultJson.senha, (err, ret)=> {
-                    if (err) return rej(err);
-                    
+                    if (err) {
+                        return rej(err);
+                    }
+                    console.log(params[1]);
                     if(ret) {
                         // Passwords match                
                         delete resultJson.senha;
@@ -22,7 +25,7 @@ exports.authentication = (params) => {
                     }
                 });
             } else {
-                // Passwords don't match
+                // Email don't match
                 return rej ('Password or email invalid.');
             }
         });
@@ -33,9 +36,12 @@ exports.update_token = (date, token, id) => {
     
     const sql = "UPDATE usuario SET token = ?, expiracao = ? WHERE id = ? ";
     let params = [date, token, id];
-    db.query(sql, [params], err => {
-        if(err) return err;
+    
+    return new Promise ((resolve, rej) => {
+        db.query(sql, [params], err => {
+            if(err) return rej(err);
 
-        return {status:200, token};
-    });
+            return resolve({status:200, token});
+        });
+    }).catch(err => {return err;});
 };
