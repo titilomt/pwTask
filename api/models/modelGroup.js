@@ -81,7 +81,7 @@ exports.get_group_by_name = grupoName => {
 };
 
 exports.join_group  = params => {
-    const sql = "INSERT INTO lista_grupo (id_user, id_grupo, privilegio, data_entrada) VALUES (?)"
+    const sql = "INSERT INTO lista_grupo (id_usuario, id_grupo, permissao) VALUES (?)"
 
     return new Promise ((res, rej) => {
         db.query(sql, [params], (err, results) => {
@@ -93,7 +93,7 @@ exports.join_group  = params => {
 };
 
 exports.leave_group  = params => {
-    const sql = `DELETE lista_grupo 
+    const sql = `DELETE FROM lista_grupo 
                  WHERE id_usuario = ? 
                  AND id_grupo = ? `;
 
@@ -101,7 +101,7 @@ exports.leave_group  = params => {
         verifyOwner(params).then(ret => {
             
             
-            db.query(sql, [params], (err, results) => {
+            db.query(sql, [params[0],params[1]], (err, results) => {
                 if(err) return rej(err);
                 
                 if(results.lenth > 0) return rej({message: 'Não existem grupos ou usuario neste caminho'});
@@ -159,10 +159,11 @@ async function verifyOwner(params) {
     const sql = "SELECT permissao FROM lista_grupo WHERE id_usuario = ? AND id_grupo = ? ";
   
     return new Promise((res, rej) => {
-        db.query(sql, [params], (err, results) => {
-            if (results.lenth === 0) return rej({message: "Grupo não encontrado."})
-            
+        db.query(sql, [params[0], params[1]], (err, results) => {
             if (err) return rej(err);
+
+            
+            if (results.lenth === 0) return rej({message: "Grupo não encontrado."});
             let resultJson = JSON.stringify(results[0]);
             resultJson = JSON.parse(resultJson);
             if (resultJson.permissao === 4) { // Permissao de dono do grupo
@@ -171,5 +172,5 @@ async function verifyOwner(params) {
             
             return rej({message:"Não é o dono."});
         });
-    });
+    }).catch(err => {return err});
 };

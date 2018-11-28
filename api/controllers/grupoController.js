@@ -96,7 +96,8 @@ exports.get_group_by_name = (req, res) => {
 exports.join_group = (req, res) => {
     const params = [
         req.body.id_user,
-        req.body.id_grupo
+        req.body.id_grupo,
+        3
     ];
     
     jwt.verify(req.token, req.body.chave, (err, authData) => {
@@ -128,7 +129,7 @@ exports.leave_group = (req, res) => {
 };
 
 exports.list_all_user_groups = (req, res) => {
-    const params = req.params.idUser;
+    const params = req.query.id_user;
 
     jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);

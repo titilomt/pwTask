@@ -15,6 +15,8 @@ router.get('/', util.verifyToken, grupoController.get_group_by_name);
 
 router.post('/joinGroup', util.verifyToken, grupoController.join_group);
 
-router.get('/', util.verifyToken, grupoController.list_all_user_groups);
+router.delete('/leaveGroup', util.verifyToken, grupoController.leave_group);
+
+router.get('/listGroups', util.verifyToken, grupoController.list_all_user_groups);
 
 module.exports = router;

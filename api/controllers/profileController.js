@@ -15,13 +15,14 @@ exports.create_profile = (req, res) => {
         req.body.privacidade
     ];
 
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-
-        modelProfile.create_profile(params).then(ret => {
-            res.status(200).send({status: 200, data: ret});
-        }).catch (err => {res.status(403).send(err)});
-    });
+        else {
+            modelProfile.create_profile(params).then(ret => {
+                res.status(200).send({status: 200, data: ret});
+            }).catch (err => {res.status(403).send(err)});
+        }
+        });
 };
 
 exports.modify_profile = (req, res) => {
@@ -34,41 +35,46 @@ exports.modify_profile = (req, res) => {
         req.body.background_img,
         req.body.perfil_img,
         req.body.privacidade,
-        req.params.idOwner,
-        req.params.idProfile
+        req.query.id_owner,
+        req.query.id_profile
     ];
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-
-        modelProfile.modify_profile(params).then(ret => {
-            res.send({ status: 200, data: ret});
-        }).catch(err => res.status(403).send(err));    
-    });
+        else {
+            modelProfile.modify_profile(params).then(ret => {
+                res.send({ status: 200, data: ret});
+            }).catch(err => res.status(403).send(err));    
+        }
+        });
 };
 
 exports.get_profile_by_id = (req, res) => {
     
-    const userID = req.params.idOwner;
+    const userID = req.query.id_owner;
     
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-        modelProfile.get_profile_by_id(userID).then(ret => {
-            res.status(200).send(ret);
-        }).catch (err => res.status(404).send(err));
+        else {
+            modelProfile.get_profile_by_id(userID).then(ret => {
+                res.status(200).send(ret);
+            }).catch (err => res.status(404).send(err));
+        }
     });
 };
 
 exports.delete_profile = (req, res) => {
     
     const params =[
-        req.params.idOwner,
-        req.params.idProfile
+        req.query.id_owner,
+        req.query.id_profile
     ];
 
-    jwt.verify(req.token, `${req.body.chave}${req.body.expiracao}`, (err, authData) => {
+    jwt.verify(req.token, req.body.chave, (err, authData) => {
         if(err) res.sendStatus(403);
-        modelProfile.delete_profile(params).then(ret => {
-            res.status(200).send(ret);
-        }).catch(err => res.status(404).send(err));
+        else {
+            modelProfile.delete_profile(params).then(ret => {
+                res.status(200).send(ret);
+            }).catch(err => res.status(404).send(err));
+        }
     });
 };
