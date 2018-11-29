@@ -16,7 +16,7 @@ exports.insert_user = params => {
                     }
                     return res (usuarioTemplate(params));
                 });
-            } else return rej (message);
+            } else return rej ({message: "E-mail já cadastrado."});
         }).catch (err => {return rej(err);});
     });    
 };

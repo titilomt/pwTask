@@ -42,7 +42,9 @@ exports.get_all_friends = userID => {
             
             let resultJson = JSON.stringify(results);
             resultJson = JSON.parse(resultJson);
-            return res(resultJson);
+            if (resultJson.length > 0){
+                return res(resultJson);
+            }return res({message: 'Você não tem amigos listados ainda. Faça amigos!'})
         });
     });
 };
