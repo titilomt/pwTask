@@ -21,6 +21,12 @@ cadastrar e ou logar na API então enviadas no HEADER da requisição.
 
 *Tipo de privacidade => 1 - publico; 2 - privado; 3 - somente amigos...
 
+### Autores
+
+#### Tiago Henrique Pereira Fonseca
+
+#### Pedro Henrique do Nascimento
+
 <ul>        
 <li>
     <code>user</code>: (POST, PUT, DELETE) CRUD de usuarios de uma rede social exemplo de rota POST <code>{{URL}}/user/login</code>:<br><pre><code>
